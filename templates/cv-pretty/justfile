@@ -4,7 +4,7 @@
 # ── Settings ──────────────────────────────────────────────
 # Bundled fonts in ./fonts are discovered via TYPST_FONT_PATHS env var.
 # This covers `just build` and `just watch`. For editor integration (LSP,
-# live preview), set TYPST_FONT_PATHS=fonts in your editor config.
+# live preview), see the README's "Editor integration" section.
 export TYPST_FONT_PATHS := "fonts"
 
 # Default source file to compile

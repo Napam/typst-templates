@@ -1,8 +1,6 @@
 # typst-templates
 
-Re-usable copy-paste templates for typst documents.
-
-This repo is a collection of ready to use single file typst templates.
+Template scaffolding system for typst documents, think shadcn, but for typst templates.
 
 ## Quick start
 
@@ -27,7 +25,8 @@ my-project/
 ├── fonts/          Atkinson Hyperlegible Next
 ├── template.typ    The template (yours to tweak)
 ├── main.typ        Your document (start writing here)
-└── justfile        just build / just watch
+├── justfile        just build / just watch
+└── typst.toml      Project root marker (for editor integration)
 ```
 
 Then:
@@ -36,6 +35,14 @@ Then:
 cd my-project
 just build          # or: just watch
 ```
+
+The available templates are:
+
+| Name      | Description                                                                         |
+| --------- | ----------------------------------------------------------------------------------- |
+| document  | The default template. This template is for general documents                        |
+| cv-ats    | ATS optimized CV template                                                           |
+| cv-pretty | Template for pretty looking CV intended for people to read, but not as ATS friendly |
 
 ### From a local clone
 
@@ -98,7 +105,10 @@ of a scaffolded project — both use `export TYPST_FONT_PATHS := "fonts"` in the
    ln -s ../../../fonts/<font-dir> templates/<name>/fonts/<font-dir>
    ```
 
-4. Test: `./scaffold.sh /tmp/test-project <name>` and run `just build` in the output.
+4. Add the new template to the root `justfile`'s `templates` list so that
+   `just build` and `just clean` include it.
+
+5. Test: `./scaffold.sh /tmp/test-project <name>` and run `just build` in the output.
 
 ### How fonts work
 
@@ -128,6 +138,7 @@ modes:
 2. Copies fonts via `cp -RL` (dereferences symlinks into real files).
 3. Copies `template.typ` as-is and `example.typ` as `main.typ`.
 4. Rewrites the justfile: `src` → `"main.typ"`.
+5. Creates `typst.toml` — a project root marker for editor integration.
 
 ### Justfile conventions
 
@@ -151,12 +162,14 @@ server and preview tools run outside of `just` — they won't see
 <details>
 <summary><strong>Neovim (tinymist + typst-preview.nvim)</strong></summary>
 
-Add `fontPaths` to your global tinymist config so the LSP finds bundled fonts in
-every project (tinymist resolves relative paths against the workspace root):
+Scaffolded projects include a `typst.toml` at the project root. Tinymist uses
+this file to detect the project root, so relative `fontPaths` resolve correctly
+assuming tinymist is configured to recognize `typst.toml` as a root marker:
 
 ```lua
 -- In your LSP config (e.g. lspconfig or vim.lsp.config):
 vim.lsp.config("tinymist", {
+    root_markers = { 'typst.toml', '.git' },
     settings = {
         fontPaths = { "fonts" },
     },
@@ -164,13 +177,14 @@ vim.lsp.config("tinymist", {
 ```
 
 For typst-preview.nvim, which spawns a separate `tinymist preview` process, add
-`--font-path` via `extra_args`:
+`--font-path` via `extra_args`. It walks upward to find `typst.toml` and uses
+that directory as the root:
 
 ```lua
 require('typst-preview').setup {
     extra_args = function(path_of_main_file)
         local main_dir = vim.fs.dirname(vim.fn.fnamemodify(path_of_main_file, ':p'))
-        local found = vim.fs.find({ 'typst.toml', '.git' }, { path = main_dir, upward = true })
+        local found = vim.fs.find('typst.toml', { path = main_dir, upward = true })
         local root = #found > 0 and vim.fs.dirname(found[1]) or main_dir
         local font_dir = root .. '/fonts'
         if vim.uv.fs_stat(font_dir) then

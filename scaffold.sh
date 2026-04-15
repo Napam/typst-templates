@@ -30,7 +30,8 @@ What gets created:
   ├── fonts/          Bundled fonts (self-contained, no repo dependency)
   ├── template.typ    The template file
   ├── main.typ        Your document (ready to edit)
-  └── justfile        Build runner (pre-configured for local fonts)
+  ├── justfile        Build runner (pre-configured for local fonts)
+  └── typst.toml      Project root marker (for editor integration)
 
 Run locally (from a clone):
   ./scaffold.sh my-project
@@ -60,6 +61,15 @@ copy_justfile() {
     fi
 }
 
+create_typst_toml() {
+    local dest="$1"
+    cat > "$dest" << 'TOML'
+# Project root marker.
+# Editors (e.g. tinymist) use this file to detect the project root,
+# which ensures relative font paths in ./fonts/ resolve correctly.
+TOML
+}
+
 do_scaffold() {
     local source_dir="$1"
     local repo_root="${2:-}"
@@ -85,17 +95,16 @@ do_scaffold() {
     cp "$source_dir/template.typ" "$TARGET/template.typ"
     cp "$source_dir/example.typ" "$TARGET/main.typ"
     copy_justfile "$source_dir/justfile" "$TARGET/justfile"
+    create_typst_toml "$TARGET/typst.toml"
 
-    # Copy any extra directories (e.g. icons/) that aren't fonts, example, template, or justfile.
+    # Copy any extra entries (e.g. icons/, profile.png) that aren't already handled above.
     for entry in "$source_dir"/*; do
         local base
         base="$(basename "$entry")"
         case "$base" in
-            fonts|template.typ|example.typ|justfile) continue ;;
+            fonts | template.typ | example.typ | example.pdf | justfile) continue ;;
         esac
-        if [[ -d "$entry" ]]; then
-            cp -R "$entry" "$TARGET/$base"
-        fi
+        cp -RL "$entry" "$TARGET/$base"
     done
 }
 

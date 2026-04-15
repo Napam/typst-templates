@@ -1,6 +1,6 @@
 // ── Shared constants ────────────────────────────────────
 // Colors
-#let meta-color = luma(150)
+#let meta-color = luma(120)
 #let foreground-color = luma(50)
 #let link-color = rgb("#2563eb")
 
