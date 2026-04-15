@@ -13,9 +13,8 @@ Scaffold a new project with one command (no clone needed):
 curl -fsSL https://raw.githubusercontent.com/Napam/typst-templates/main/scaffold.sh | bash -s my-project
 ```
 
-# Or specify template explicitly
-
-```
+```bash
+# or specify template directly
 curl -fsSL https://raw.githubusercontent.com/Napam/typst-templates/main/scaffold.sh | bash -s my-project document
 ```
 

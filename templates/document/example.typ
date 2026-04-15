@@ -2,7 +2,7 @@
 
 #show: template-base.with(
   title: "Template Style Guide",
-  author: "Jane Doe",
+  author: "Natsuki Subaru",
   date: datetime.today(),
   keywords: ("typst", "template", "example"),
   show-header: true,

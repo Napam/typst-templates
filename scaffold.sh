@@ -85,6 +85,18 @@ do_scaffold() {
     cp "$source_dir/template.typ" "$TARGET/template.typ"
     cp "$source_dir/example.typ" "$TARGET/main.typ"
     copy_justfile "$source_dir/justfile" "$TARGET/justfile"
+
+    # Copy any extra directories (e.g. icons/) that aren't fonts, example, template, or justfile.
+    for entry in "$source_dir"/*; do
+        local base
+        base="$(basename "$entry")"
+        case "$base" in
+            fonts|template.typ|example.typ|justfile) continue ;;
+        esac
+        if [[ -d "$entry" ]]; then
+            cp -R "$entry" "$TARGET/$base"
+        fi
+    done
 }
 
 # ── Args ─────────────────────────────────────────────────────

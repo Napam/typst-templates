@@ -1,0 +1,29 @@
+# CV (ATS-friendly) template task runner
+# Usage: just <recipe>    Run: just --list
+
+# ── Settings ──────────────────────────────────────────────
+# Bundled fonts in ./fonts are discovered via TYPST_FONT_PATHS env var.
+# This covers `just build` and `just watch`. For editor integration (LSP,
+# live preview), set TYPST_FONT_PATHS=fonts in your editor config.
+export TYPST_FONT_PATHS := "fonts"
+
+# Default source file to compile
+src := "example.typ"
+
+# ── Recipes ───────────────────────────────────────────────
+
+# Build the CV to PDF
+build file=src:
+    typst compile "{{file}}"
+
+# Watch for changes and recompile
+watch file=src:
+    typst watch "{{file}}"
+
+# List available fonts (useful for debugging)
+fonts:
+    typst fonts
+
+# Clean generated PDFs
+clean:
+    rm -f *.pdf
