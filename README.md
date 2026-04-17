@@ -53,6 +53,17 @@ cd typst-templates
 ./scaffold.sh ~/Documents/my-report document    # explicit template name
 ```
 
+You can also scaffold into an existing directory (including `.`):
+
+```bash
+mkdir my-project && cd my-project
+../scaffold.sh . document
+```
+
+If the directory is not empty, the script warns and asks for confirmation before
+proceeding. In non-interactive mode (e.g. piped via `curl | bash`), it refuses
+to scaffold into a non-empty directory.
+
 ## Why not make them into packages?
 
 1. Don't wanna deal with packages when I can just copy paste a single file and
@@ -134,7 +145,8 @@ modes:
 
 **What it does:**
 
-1. Validates the target directory doesn't exist and the template name is valid.
+1. Validates the target (may be an existing directory, including `.`; warns and
+   prompts if non-empty) and the template name.
 2. Copies fonts via `cp -RL` (dereferences symlinks into real files).
 3. Copies `template.typ` as-is and `example.typ` as `main.typ`.
 4. Rewrites the justfile: `src` → `"main.typ"`.

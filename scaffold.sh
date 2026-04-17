@@ -22,7 +22,7 @@ Usage: scaffold.sh <target-dir> [template]
 Scaffold a new Typst project from a template.
 
 Arguments:
-  target-dir   Directory to create (must not already exist)
+  target-dir   Directory to create, or "." to use the current directory
   template     Template name (default: document)
 
 What gets created:
@@ -116,8 +116,22 @@ TEMPLATE="${2:-document}"
 
 # ── Validate ─────────────────────────────────────────────────
 if [[ -e "$TARGET" ]]; then
-    echo "Error: '$TARGET' already exists." >&2
-    exit 1
+    if [[ ! -d "$TARGET" ]]; then
+        echo "Error: '$TARGET' exists and is not a directory." >&2
+        exit 1
+    fi
+    # Warn if the directory is not empty
+    if [[ -n "$(ls -A "$TARGET" 2>/dev/null)" ]]; then
+        echo "Warning: '$TARGET' is not empty. Existing files may be overwritten." >&2
+        if [[ -t 0 ]]; then
+            printf "Continue? [y/N] " >&2
+            read -r reply
+            [[ "$reply" =~ ^[Yy]$ ]] || exit 1
+        else
+            echo "Error: refusing to overwrite in non-interactive mode." >&2
+            exit 1
+        fi
+    fi
 fi
 
 # ── Scaffold (local mode) ───────────────────────────────────
