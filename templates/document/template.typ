@@ -1,6 +1,6 @@
 // ── Shared constants ────────────────────────────────────
 // Colors
-#let meta-color = luma(120)
+#let meta-color = luma(150)
 #let foreground-color = luma(50)
 #let link-color = rgb("#2563eb")
 
@@ -11,7 +11,7 @@
 #let par-spacing = 1.2em
 
 // Heading sizes
-#let h1-size = 1.4em
+#let h1-size = 1.3em
 #let h2-size = 1.2em
 #let h3-size = 1.1em
 
@@ -27,7 +27,9 @@
 #let page-margin = 2.5cm
 
 // Figures
-#let figure-gap = 0.8em
+#let figure-above = 0.4em
+#let figure-below = 0.6em
+#let figure-caption-gap = 0.8em
 #let caption-size = 0.9em
 
 // ── Header (internal) ───────────────────────────────────
@@ -112,8 +114,13 @@
   show link: set text(fill: link-color)
 
   // Figures
-  set figure(gap: figure-gap)
+  set figure(gap: figure-caption-gap)
   show figure.caption: set text(size: caption-size)
+  show figure: fig => {
+    v(figure-above)
+    fig
+    v(figure-below)
+  }
 
   if show-header {
     _doc-header(title, author, date)
