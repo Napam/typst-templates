@@ -1,7 +1,7 @@
 # Root task runner — operates across all templates
 # Usage: just <recipe>    Run: just --list
 
-templates := "templates/document templates/cv-pretty templates/cv-ats"
+templates := "templates/document templates/cv-pretty templates/cv-ats templates/presentation"
 
 # Build example.pdf for every template (parallel)
 build:

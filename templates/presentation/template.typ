@@ -3,14 +3,16 @@
 #let meta-color = luma(150)
 #let foreground-color = luma(50)
 #let link-color = rgb("#2563eb")
+#let page-fill = rgb(255, 255, 255)
 
 // Typography
-#let body-font = "Atkinson Hyperlegible Next"
+#let body-font = "PT Sans"
 #let body-size = 11pt
 #let par-leading = 0.7em
 #let par-spacing = 1.2em
 
 // Heading sizes
+#let title-size = 2em
 #let h1-size = 1.3em
 #let h2-size = 1.2em
 #let h3-size = 1.1em
@@ -23,12 +25,12 @@
 #let h3-above = 0.4em
 #let h3-below = 0.2em
 
-// Layout
-#let page-margin = 2.5cm
-
-// Lists
+// List spacing
 #let list-above = 1.0em
 #let list-below = 1.0em
+
+// Layout
+#let page-margin = 2.5cm
 
 // Figures
 #let figure-above = 0.4em
@@ -40,6 +42,7 @@
 // Renders a visual title block with optional byline.
 // Called automatically by template-base when show-header is true.
 #let _doc-header(title, author, date) = {
+  set align(center + horizon)
   let formatted-date = if date == none { none } else if type(date) == datetime {
     date.display("[month repr:long] [day], [year]")
   } else {
@@ -49,7 +52,7 @@
   // Title — semantic H1 with outlined:false so the template's body
   // heading show rules (which add vertical spacing) don't apply.
   {
-    set text(size: h1-size)
+    set text(size: title-size)
     heading(level: 1, outlined: false, bookmarked: false, title)
   }
 
@@ -61,14 +64,22 @@
     if formatted-date != none { parts.push(formatted-date) }
 
     if parts.len() > 0 {
-      v(0.2em)
-      text(size: 0.85em, fill: meta-color, parts.join([ #sym.dot.c ]))
+      v(1em)
+      text(size: 1em, fill: meta-color, parts.join([ #sym.dot.c ]))
     }
   }
 }
 
 // ── Document template ───────────────────────────────────
-#let template-base(title: "", author: "", date: none, keywords: (), show-header: false, doc) = {
+#let template-base(
+  title: "",
+  author: "",
+  date: none,
+  keywords: (),
+  show-title-page: false,
+  page-fill: page-fill,
+  doc,
+) = {
   set document(
     title: title,
     author: author,
@@ -77,13 +88,10 @@
   )
 
   set page(
+    fill: page-fill,
+    paper: "presentation-16-9",
     margin: page-margin,
-    footer: context {
-      let current = counter(page).get().first()
-      let total = counter(page).final().first()
-      set text(size: 0.85em, fill: meta-color)
-      align(center, [#current / #total])
-    },
+    numbering: "1",
   )
   // Bundled font: Atkinson Hyperlegible Next (via TYPST_FONT_PATHS)
   set text(
@@ -114,6 +122,15 @@
     v(h3-below)
   }
 
+  // Wrap `it` in a `block(above:, below:)` rather than using
+  // `set block(above:, below:)` inside the show body. The `set` form
+  // does not reliably attach to the already-constructed list/enum
+  // (notably `above:` is ignored for lists/enum placed inside grid
+  // cells, where the element's own default spacing leaks through).
+  // Wrapping the element makes both spacings honored everywhere.
+  show list: it => block(above: list-above, below: list-below, it)
+  show enum: it => block(above: list-above, below: list-below, it)
+
   // Links
   show link: set text(fill: link-color)
 
@@ -126,11 +143,7 @@
     v(figure-below)
   }
 
-  // Lists
-  show list: it => block(above: list-above, below: list-below, it)
-  show enum: it => block(above: list-above, below: list-below, it)
-
-  if show-header {
+  if show-title-page {
     _doc-header(title, author, date)
   }
 
