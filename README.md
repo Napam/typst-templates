@@ -38,11 +38,12 @@ just build          # or: just watch
 
 The available templates are:
 
-| Name      | Description                                                                         |
-| --------- | ----------------------------------------------------------------------------------- |
-| document  | The default template. This template is for general documents                        |
-| cv-ats    | ATS optimized CV template                                                           |
-| cv-pretty | Template for pretty looking CV intended for people to read, but not as ATS friendly |
+| Name         | Description                                                                         |
+| ------------ | ----------------------------------------------------------------------------------- |
+| document     | The default template. This template is for general documents                        |
+| presentation | Template to make presentations (like Beamer in LaTeX )                              |
+| cv-ats       | ATS optimized CV template                                                           |
+| cv-pretty    | Template for pretty looking CV intended for people to read, but not as ATS friendly |
 
 ### From a local clone
 
