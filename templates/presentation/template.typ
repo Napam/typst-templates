@@ -77,7 +77,6 @@
   date: none,
   keywords: (),
   show-title-page: false,
-  page-fill: page-fill,
   doc,
 ) = {
   set document(
