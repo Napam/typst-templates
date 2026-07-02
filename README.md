@@ -65,14 +65,27 @@ If the directory is not empty, the script warns and asks for confirmation before
 proceeding. In non-interactive mode (e.g. piped via `curl | bash`), it refuses
 to scaffold into a non-empty directory.
 
-## Why not make them into packages?
+## Why would this be better than global templates?
 
-1. Don't wanna deal with packages when I can just copy paste a single file and
-   use and tweak as I want per document.
-1. Just having a copy pasted template means zero dependencies and fully
-   reproducible builds.
+I could put typst template files at `{data-dir}/typst/packages/local`, then I
+could import "globally". To me things brings some issues:
 
----
+1. If I updated the template, old files changes could possibly change in
+   appearance on recompilation.
+
+2. It requires me to have the templates "installed" in my environment
+
+3. Available fonts varies across environments. Meaning templates may break.
+
+This solution "bundles" everything I need for a typst project into a single directory,
+making it way more reproducible.
+
+1. Scaffolds a template file, font, and a justfile for convenience.
+2. I get to have this repo as a central place to store and version control my typst templates.
+3. Existing scaffolded projects won't change, since they are entirely self contained.
+
+<br>
+<br>
 
 ## Developer Guide
 
@@ -99,14 +112,14 @@ typst-templates/
 
 Each template's `fonts/` directory contains **symlinks** to the shared `fonts/`
 at the repo root. This means the in-repo template directory mirrors the structure
-of a scaffolded project — both use `export TYPST_FONT_PATHS := "fonts"` in the justfile.
+of a scaffolded project both use `export TYPST_FONT_PATHS := "fonts"` in the justfile.
 
 ### Adding a new template
 
 1. Create `templates/<name>/` with these files:
-   - **`template.typ`** — The template.
-   - **`example.typ`** — A working example that imports and uses the template.
-   - **`justfile`** — Copy from an existing template; adjust if needed.
+   - **`template.typ`** - The template.
+   - **`example.typ`** - A working example that imports and uses the template.
+   - **`justfile`** - Copy from an existing template; adjust if needed.
 
 2. Add any new fonts to `fonts/<font-dir>/` (include the `OFL.txt` license file).
 
@@ -126,13 +139,13 @@ of a scaffolded project — both use `export TYPST_FONT_PATHS := "fonts"` in the
 
 Fonts live in `fonts/` at the repo root. Each template symlinks only the fonts it
 needs into its own `fonts/` directory. When scaffolding, `cp -RL` dereferences
-these symlinks so the output project gets real copies — fully self-contained.
+these symlinks so the output project gets real copies.
 
 The symlink path is always `../../../fonts/<font-dir>` (three levels up from
 `templates/<name>/fonts/`).
 
 If a symlink is broken (target font directory doesn't exist), `just build` will
-fail immediately in the template directory — you catch the problem at dev time.
+fail immediately in the template directory, you catch the problem at dev time.
 
 ### How `scaffold.sh` works
 
@@ -151,7 +164,7 @@ modes:
 2. Copies fonts via `cp -RL` (dereferences symlinks into real files).
 3. Copies `template.typ` as-is and `example.typ` as `main.typ`.
 4. Rewrites the justfile: `src` → `"main.typ"`.
-5. Creates `typst.toml` — a project root marker for editor integration.
+5. Creates `typst.toml` a project root marker for editor integration.
 
 ### Justfile conventions
 
@@ -169,7 +182,7 @@ additional font directories. The justfile exports it so that `typst compile` and
 #### Editor integration (optional)
 
 The env var covers `just build` and `just watch`, but your editor's language
-server and preview tools run outside of `just` — they won't see
+server and preview tools run outside of `just` they won't see
 `TYPST_FONT_PATHS` unless you configure them separately.
 
 <details>
@@ -237,6 +250,6 @@ export TYPST_FONT_PATHS="fonts"
 
 Then `direnv allow`. This sets the env var for your entire shell session in that
 directory, so every tool (CLI, LSP, preview) inherits it. The scaffolder does not
-create this file by default — add it manually if you use direnv.
+create this file by default, add it manually if you use direnv.
 
 </details>
